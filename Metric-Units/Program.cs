@@ -29,13 +29,26 @@ namespace MetricUnits
         {
             Console.WriteLine("Initialization Complete");
 
+            if (Settings.keys.Count == 0)
+            {
+                Console.WriteLine($"[ERROR]:  The plugin list is empty! (See the settings tab to add plugins)");
+                return;
+            }
+
             ulong count = 0;
 
-            Regex regex = new("<([0-9.-]+)>\\s([Ff][EeOo][EeOo][Tt])", RegexOptions.Singleline);
-            
+            Regex regex = new("<([0-9.-]+)>\\s(\\w+)", RegexOptions.Singleline);
+
+
+            int tmpcount = 0;
+            foreach(var plugin in state.LoadOrder.ListedOrder)
+            {
+                Console.WriteLine($"[{tmpcount++}]:\t {plugin.ModKey}");
+            }
+
             foreach (var mgef in state.LoadOrder.PriorityOrder.MagicEffect().WinningContextOverrides())
             {
-                if (Settings.Whitelisted(mgef.ModKey) || mgef.Record.EditorID == null || mgef.Record.Description == null || !mgef.Record.Description.Any())
+                if (!Settings.Whitelisted(mgef) || mgef.Record.EditorID == null || mgef.Record.Description == null || !mgef.Record.Description.Any())
                     continue;
 
                 var copy = mgef.Record.DeepCopy()!;
@@ -44,35 +57,40 @@ namespace MetricUnits
                 // replace all regex matches with the string determined by the delegate
                 var str = regex.Replace(copy.Description!.Lookup(Language.English) ?? "", delegate(Match m)
                 {
-                    if (!m.Success || m.Groups.Count < 2)
-                        return m.Value; // don't modify
-                    
-                    Unit.ID unit = Unit.FromString(m.Groups[1].Value);
+                    Unit.ID unit = Unit.FromString(m.Groups[2].Value);
                    
-                    if (unit == Unit.ID.FEET)
-                        return m.Value;
+                    if (unit != Unit.ID.FEET)
+                        return m.Groups[0].Value;
 
-                    double n = Convert.ToDouble(m.Groups[0].Value);
+                    if (!m.Groups[1].Value.All(ch => Utilities.isnumchar(ch)))
+                        return m.Groups[0].Value;
 
+                    double n = Convert.ToDouble(m.Groups[1].Value);
                     double? result = Unit.Convert(n, unit, Unit.ID.METERS);
 
                     if (result == null)
-                        return m.Value;
+                        return m.Groups[0].Value;
 
-                    Console.WriteLine($"[{++count}]\tReplaced usage of feet with meters in record: {mgef.Record.EditorID}");
+                    string s = $"<{result}> meter{(result.EqualsWithin(1.0) ? "" : "s")}";
 
-                    return $"<{result}> meter{(result.EqualsWithin(1.0) ? "s" : "")}";
+                    Console.WriteLine($"[{++count}]\tAdding override \"{s}\" for \"{m.Groups[0].Value}\" in record: {mgef.Record.EditorID}");
+                    
+                    return s;
                 });
 
                 if (count == copyCount)
                     continue;
-                
+
+                copy.Description = str;
+
+                Console.WriteLine(str);
+
                 // else copy back into output patch
                 state.PatchMod.MagicEffects.Set(copy);
             }
             
 
-            Console.WriteLine($"Complete. Patched {count} record{(count > 1 ? "s" : "")}.");
+            Console.WriteLine($"Complete. Patched {count} record{(count == 0 || count > 1 ? "s" : "")}.");
         }
     }
 }
