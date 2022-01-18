@@ -69,7 +69,7 @@ namespace MetricUnits.Util
 
                 string s = $"<{in_meters}> {(Settings.use_american_spelling ? "meters" : "metres")}";
 
-                Console.WriteLine($"[{++count}]\tAdding override \"{s}\" for \"{m.Groups[0].Value}\" in record: {mgef.Record.EditorID}");
+                Console.WriteLine($"[{++count}]\tAdding override \"{s}\" for \"{m.Groups[0].Value}\"");
 
                 return s;
             });
