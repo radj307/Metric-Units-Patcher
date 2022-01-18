@@ -46,12 +46,14 @@ namespace MetricUnits
 
             foreach (var msg in state.LoadOrder.PriorityOrder.Message().WinningContextOverrides())
             {
-                if (!Settings.Whitelisted(msg))
+                if (!Settings.Whitelisted(msg) || msg.Record.EditorID == null)
                     continue;
+
+                //Console.WriteLine($"Processing {(Settings.enable_whitelist ? "whitelisted" : "")} record: {msg.Record.EditorID}");
 
                 var copy = msg.Record.DeepCopy();
 
-                var (str, changes) = Utilities.PatchString(copy.Description!.Lookup(Language.English) ?? "", ckconv, Settings);
+                var (str, changes) = Utilities.PatchString(copy.Description!.Lookup(Language.English) ?? "", ckconv, Settings, msg.Record.EditorID);
 
                 if (changes == 0)
                     continue;
@@ -65,12 +67,14 @@ namespace MetricUnits
 
             foreach (var mgef in state.LoadOrder.PriorityOrder.MagicEffect().WinningContextOverrides())
             {
-                if (!Settings.Whitelisted(mgef) || mgef.Record.EditorID == null || mgef.Record.Description == null || !mgef.Record.Description.Any())
+                if (!Settings.Whitelisted(mgef) || mgef.Record.EditorID == null || mgef.Record.Description == null)
                     continue;
+
+                //Console.WriteLine($"Processing {(Settings.enable_whitelist ? "whitelisted" : "")} record: {mgef.Record.EditorID}");
 
                 var copy = mgef.Record.DeepCopy()!;
 
-                var (str, changes) = Utilities.PatchString(copy.Description!.Lookup(Language.English) ?? "", ckconv, Settings);
+                var (str, changes) = Utilities.PatchString(copy.Description!.Lookup(Language.English) ?? "", ckconv, Settings, mgef.Record.EditorID);
 
                 if (changes == 0)
                     continue;
@@ -87,9 +91,11 @@ namespace MetricUnits
                 if (!Settings.Whitelisted(perk))
                     continue;
 
+                //Console.WriteLine($"Processing {(Settings.enable_whitelist ? "whitelisted" : "")} record: {perk.Record.EditorID}");
+
                 var copy = perk.Record.DeepCopy();
 
-                var (str, changes) = Utilities.PatchString(copy.Description!.Lookup(Language.English) ?? "", ckconv, Settings);
+                var (str, changes) = Utilities.PatchString(copy.Description!.Lookup(Language.English) ?? "", ckconv, Settings, perk.Record.EditorID);
 
                 if (changes == 0)
                     continue;

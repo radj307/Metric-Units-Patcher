@@ -19,8 +19,8 @@ namespace MetricUnits.Util
         [SettingName("Enable Plugin Whitelist"), Tooltip("When checked, only whitelisted plugins will be checked.")]
         public bool enable_whitelist = true;
 
-        [SettingName("Decimal Precision"), Tooltip("This is the number of digits after the decimal to keep when rounding the resulting value in meters.")]
-        public uint round_to_decimal = 1;
+        [SettingName("Truncate Decimals After"), Tooltip("Truncate digits that appear this many characters after the decimal point.")]
+        public uint max_decimal = 0;
 
         [SettingName("Use \"Meter\" instead of \"Metre\""), Tooltip("When checked, the American spelling of Meter is used.")]
         public bool use_american_spelling = true;
