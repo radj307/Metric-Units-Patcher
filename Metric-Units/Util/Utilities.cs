@@ -1,10 +1,18 @@
+using Mutagen.Bethesda.Strings;
 using System;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace MetricUnits.Util
 {
-    internal struct Utilities
+    internal class Utilities
     {
-        public static bool isdigit(char c)
+        /// <summary>
+        /// Returns true when the given character is a digit.
+        /// </summary>
+        /// <param name="c">Input Character</param>
+        /// <returns>bool</returns>
+        public static bool Isdigit(char c)
         {
             switch (c)
             {
@@ -23,51 +31,50 @@ namespace MetricUnits.Util
                 return false;
             }
         }
-        public static bool isnumchar(char c)
+        /// <summary>
+        /// Returns true when c is any digit, a period, or a dash. (negative)
+        /// </summary>
+        /// <param name="c">Input Character</param>
+        /// <returns>bool</returns>
+        public static bool IsValidNumber(char c)
         {
-            return isdigit(c) || c == '.' || c == '-';
+            return Isdigit(c) || c == '.' || c == '-';
+        }
+        /// <summary>
+        /// Returns true when all characters in the given string are digits, periods, or dashes.
+        /// </summary>
+        /// <param name="s">Input String</param>
+        /// <returns>bool</returns>
+        public static bool IsValidNumber(string s)
+        {
+            return s.All(ch => IsValidNumber(ch));
+        }
+
+        public static (string, ulong) PatchString(string s, CreationKitUnitConverter ckconv, Settings Settings)
+        {
+            if (s.Length == 0)
+                return (s, 0);
+            ulong count = 0ul;
+
+            Settings.regex.Replace(s, delegate (Match m)
+            {
+                if (!Utilities.IsValidNumber(m.Groups[1].Value))
+                    return m.Groups[0].Value; // not all characters are valid when converted to a double
+
+                // get the equivalent value in meters from ckconv.exe
+                string in_meters = ckconv.Convert(m.Groups[1].Value, "ft", "m");
+
+                if (in_meters.Length == 0)
+                    return m.Groups[0].Value;
+
+                string s = $"<{in_meters}> {(Settings.use_american_spelling ? "meters" : "metres")}";
+
+                Console.WriteLine($"[{++count}]\tAdding override \"{s}\" for \"{m.Groups[0].Value}\" in record: {mgef.Record.EditorID}");
+
+                return s;
+            });
+
+            return (s, count);
         }
     }
-
-    internal class Unit
-    {
-        public enum ID
-        {
-            NONE,
-            METERS,
-            FEET,
-        }
-
-        private const double ONE_FOOT_IN_METERS = 0.3048;
-
-        public static double? Convert(double value, ID in_unit, ID out_unit)
-        {
-            if (out_unit == ID.NONE)
-                return null;
-
-            if (in_unit == out_unit || in_unit == ID.NONE)
-                return null;
-
-            if (in_unit == ID.FEET && out_unit == ID.METERS)
-            {
-                value *= ONE_FOOT_IN_METERS;
-            }
-            if (in_unit == ID.METERS && out_unit == ID.FEET)
-            {
-                value /= ONE_FOOT_IN_METERS;
-            }
-            
-            return Math.Round(value, 1);
-        }
-
-        public static ID FromString(string s)
-        {
-            if (s.Equals("feet", StringComparison.OrdinalIgnoreCase))
-                return ID.FEET;
-            if (s.Equals("meters", StringComparison.OrdinalIgnoreCase))
-                return ID.METERS;
-            return ID.NONE;
-        }
-    }
-
 }
