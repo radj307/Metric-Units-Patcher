@@ -25,8 +25,6 @@ namespace MetricUnits.Util
         [SettingName("Use \"Meter\" instead of \"Metre\""), Tooltip("When checked, the American spelling of Meter is used.")]
         public bool use_american_spelling = true;
 
-        public Regex regex = new("<([0-9.-]+)>\\s(\\w+)", RegexOptions.Singleline);
-
         public bool Whitelisted(ModKey modkey)
         {
             return !enable_whitelist || keys.Contains(modkey);

@@ -50,13 +50,15 @@ namespace MetricUnits.Util
             return s.All(ch => IsValidNumber(ch));
         }
 
+        public static Regex regex = new("<([0-9.-]+)>\\s\\b(foot|feet|inch|inches|mile|miles)\\b", RegexOptions.Singleline | RegexOptions.IgnoreCase);
+
         public static (string, ulong) PatchString(string s, CreationKitUnitConverter ckconv, Settings Settings)
         {
             if (s.Length == 0)
                 return (s, 0);
             ulong count = 0ul;
 
-            Settings.regex.Replace(s, delegate (Match m)
+            regex.Replace(s, delegate (Match m)
             {
                 if (!Utilities.IsValidNumber(m.Groups[1].Value))
                     return m.Groups[0].Value; // not all characters are valid when converted to a double
