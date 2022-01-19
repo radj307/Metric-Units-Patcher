@@ -1,2 +1,2 @@
 # Metric-Units-Patcher
-This Synthesis patcher changes the imperial units in Ordinator - Perks of Skyrim to metric units
+This Synthesis patcher changes in-game length/distance measurements in mods from imperial to metric.
