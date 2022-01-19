@@ -2,12 +2,9 @@ using MetricUnits.Util;
 using Mutagen.Bethesda;
 using Mutagen.Bethesda.Skyrim;
 using Mutagen.Bethesda.Strings;
-using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Synthesis;
 using Noggog;
 using System;
-using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 

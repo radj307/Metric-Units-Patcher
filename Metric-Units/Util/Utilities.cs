@@ -1,4 +1,3 @@
-using Mutagen.Bethesda.Strings;
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -71,9 +70,9 @@ namespace MetricUnits.Util
 
                 bool centimeters = false;
 
+                var i = in_meters.IndexOf('.');
                 if (!in_meters.StartsWith('0'))
                 {
-                    var i = in_meters.IndexOf('.');
                     if (i != -1)
                     {
                         if (Settings.max_decimal == 0)
@@ -86,11 +85,12 @@ namespace MetricUnits.Util
                         }
                     }
                 }
-                else
+                else if (Settings.allow_centimeters) // move the decimal 2 to the right and call it centimeters
                 {
-                    in_meters = ckconv.Convert(m.Groups[2].Value, m.Groups[4].Value, "cm");
+                    in_meters = in_meters.Remove(0, i + 1).Insert(i + 1, ".");
                     centimeters = true;
                 }
+                // else ignore, or result could potentially be 0
 
                 string s = $"{m.Groups[1].Value}{in_meters}{m.Groups[3].Value} {(centimeters ? "centi" : "")}{(Settings.use_american_spelling ? "meters" : "metres")}";
 

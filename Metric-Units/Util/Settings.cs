@@ -1,9 +1,7 @@
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.WPF.Reflection.Attributes;
-using Mutagen.Bethesda.Skyrim;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 
 namespace MetricUnits.Util
 {
@@ -20,10 +18,13 @@ namespace MetricUnits.Util
         public bool enable_whitelist = true;
 
         [SettingName("Truncate Decimals After"), Tooltip("Truncate digits that appear this many characters after the decimal point.")]
-        public uint max_decimal = 0;
+        public uint max_decimal = 1;
 
         [SettingName("Use \"Meter\" instead of \"Metre\""), Tooltip("When checked, the American spelling of Meter is used.")]
         public bool use_american_spelling = true;
+
+        [SettingName("Allow Centimeters"), Tooltip("When checked, values smaller than 1 meter will be converted to centimeters instead. If unchecked, all values will be in meters, and any values less than 1 will ignore the \"Truncate Decimals After\" setting.")]
+        public bool allow_centimeters = true;
 
         public bool Whitelisted(ModKey modkey)
         {
