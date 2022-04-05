@@ -8,29 +8,43 @@ namespace MetricUnits.Util
     public class Settings
     {
         [MaintainOrder]
-        [SettingName("Plugin Whitelist"), Tooltip("Only plugins on this list will be checked for imperial units to convert.")]
+        [SettingName("Plugin Whitelist")]
+        [Tooltip("Only plugins on this list will be checked for imperial units to convert.")]
         public List<ModKey> keys = new()
         {
             ModKey.FromNameAndExtension("Ordinator - Perks of Skyrim.esp")
         };
 
-        [SettingName("Enable Plugin Whitelist"), Tooltip("When checked, only whitelisted plugins will be checked.")]
+        [SettingName("Enable Plugin Whitelist")]
+        [Tooltip("When checked, only whitelisted plugins will be checked.")]
         public bool enable_whitelist = true;
 
-        [SettingName("Truncate Decimals After"), Tooltip("Truncate digits that appear this many characters after the decimal point.")]
+        [SettingName("Truncate Decimals After")]
+        [Tooltip("Truncate digits that appear this many characters after the decimal point.")]
         public uint max_decimal = 1;
 
-        [SettingName("Use \"Meter\" instead of \"Metre\""), Tooltip("When checked, the American spelling of Meter is used.")]
+        [SettingName("Use \"Meter\" instead of \"Metre\"")]
+        [Tooltip("When checked, the American spelling of Meter is used.")]
         public bool use_american_spelling = true;
 
-        [SettingName("Allow Centimeters"), Tooltip("When checked, values smaller than 1 meter will be converted to centimeters instead. If unchecked, all values will be in meters, and any values less than 1 will ignore the \"Truncate Decimals After\" setting.")]
+        [SettingName("Allow Centimeters")]
+        [Tooltip("When checked, values smaller than 1 meter will be converted to centimeters instead. If unchecked, all values will be in meters, and any values less than 1 will ignore the \"Truncate Decimals After\" setting.")]
         public bool allow_centimeters = true;
 
+        /// <summary>
+        /// Check if the given plugin is whitelisted, or if the whitelist is disabled.
+        /// </summary>
+        /// <param name="modkey">Modkey to check.</param>
+        /// <returns>True when the plugin should be processed.</returns>
         public bool Whitelisted(ModKey modkey)
         {
             return !enable_whitelist || keys.Contains(modkey);
         }
-
+        /// <summary>
+        /// Recursive overload of <see cref="Whitelisted(ModKey)"/>.
+        /// </summary>
+        /// <param name="record">Mod context to check recursively.</param>
+        /// <returns>True when the plugin should be processed.</returns>
         public bool Whitelisted(IModContext record)
         {
             return Whitelisted(record.ModKey) || (record.Parent != null && Whitelisted(record.Parent));

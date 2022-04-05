@@ -104,12 +104,7 @@ namespace MetricUnits
                 ++count;
             }
 
-
-            Console.WriteLine($"Patching Process Completed.");
-            if (count == 0)
-                Console.WriteLine("No valid records were found!");
-            else
-                Console.WriteLine($"Patched {count} record{(count > 1 ? "s" : "")}.");
+            Console.WriteLine($"Patcher complete. Modified {count} record{(count > 0 ? "s" : "")}.");
         }
     }
 }

@@ -7,50 +7,34 @@ namespace MetricUnits.Util
     internal class Utilities
     {
         /// <summary>
-        /// Returns true when the given character is a digit.
-        /// </summary>
-        /// <param name="c">Input Character</param>
-        /// <returns>bool</returns>
-        public static bool Isdigit(char c)
-        {
-            switch (c)
-            {
-            case '0':
-            case '1':
-            case '2':
-            case '3':
-            case '4':
-            case '5':
-            case '6':
-            case '7':
-            case '8':
-            case '9':
-                return true;
-            default:
-                return false;
-            }
-        }
-        /// <summary>
         /// Returns true when c is any digit, a period, or a dash. (negative)
         /// </summary>
         /// <param name="c">Input Character</param>
         /// <returns>bool</returns>
-        public static bool IsValidNumber(char c)
-        {
-            return Isdigit(c) || c == '.' || c == '-';
-        }
+        public static bool IsValidNumber(char c) => char.IsDigit(c) || c == '.' || c == '-';
         /// <summary>
         /// Returns true when all characters in the given string are digits, periods, or dashes.
         /// </summary>
         /// <param name="s">Input String</param>
         /// <returns>bool</returns>
-        public static bool IsValidNumber(string s)
-        {
-            return s.All(ch => IsValidNumber(ch));
-        }
+        public static bool IsValidNumber(string s) => s.All(IsValidNumber);
 
-        public static Regex regex = new("(<*)([0-9.-]+)(>*)\\s\\b(foot|feet|inch|inches|mile|miles)\\b", RegexOptions.Singleline | RegexOptions.IgnoreCase);
+        /// <summary>
+        /// The regular expression used to detect imperial length units.
+        /// </summary>
+        public static Regex regex = new("(<*)([0-9.-]+)(>*)\\s+?\\b(foot|feet|inch|inches|mile|miles)\\b", RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
+        /// <summary>
+        /// Convert all values measured with imperial length units in the input string into their metric equivalents by using regular expressions & the ckconv executable.
+        /// </summary>
+        /// <param name="s">Input String</param>
+        /// <param name="ckconv">Converter Object</param>
+        /// <param name="Settings">Settings Object</param>
+        /// <param name="editor_id">Optional editor ID used to print a more descriptive log message.</param>
+        /// <returns><list type="table">
+        /// <item><term>Item1</term><description>The output string.</description></item>
+        /// <item><term>Item2</term><description>The number of changes made to the string.</description></item>
+        /// </list></returns>
         public static (string, ulong) PatchString(string s, CreationKitUnitConverter ckconv, Settings Settings, string? editor_id = null)
         {
             if (s.Length == 0)
@@ -62,7 +46,6 @@ namespace MetricUnits.Util
                 if (!IsValidNumber(m.Groups[1].Value))
                     return m.Groups[0].Value; // not all characters are valid when converted to a double
 
-                // get the equivalent value in meters from ckconv.exe
                 string in_meters = ckconv.Convert(m.Groups[2].Value, m.Groups[4].Value, "m");
 
                 if (in_meters.Length == 0)
@@ -97,9 +80,9 @@ namespace MetricUnits.Util
                 ++count;
 
                 if (editor_id != null)
-                    Console.WriteLine($"\"{m.Groups[0].Value}\" => \"{s}\" in record {editor_id}");
+                    Console.WriteLine($"'{m.Groups[0].Value}' => '{s}' in record {editor_id}");
                 else
-                    Console.WriteLine($"\"{m.Groups[0].Value}\" => \"{s}\"");
+                    Console.WriteLine($"'{m.Groups[0].Value}' => '{s}'");
 
                 return s;
             });
