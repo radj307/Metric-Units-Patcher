@@ -1,8 +1,8 @@
 {
   "Nickname": "Metric Units Patcher",
-  "Visibility": "Hidden",
+  "Visibility": "Visible",
   "OneLineDescription": "Patcher that converts from imperial units to metric units.",
-  "LongDescription": "",
+  "LongDescription": "Converts imperial length units used by Ordinator's perk descriptions to metric.",
   "PreferredAutoVersioning": "Default",
   "RequiredMods": []
 }
