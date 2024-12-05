@@ -32,7 +32,7 @@ namespace MetricUnits
         private string? Exec(string arguments)
         {
             using Process ckconv = new();
-            ckconv.StartInfo.FileName = executable_name;
+            ckconv.StartInfo.FileName = path;
             ckconv.StartInfo.Arguments = arguments;
             ckconv.StartInfo.UseShellExecute = false;
             ckconv.StartInfo.RedirectStandardOutput = true;
